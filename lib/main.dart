@@ -27,8 +27,16 @@ void main() async {
     overlays: [SystemUiOverlay.top],
   );
 
-  await SharedPreferencesUtil().init();
-  await StorageUtil().init();
+  try {
+    await SharedPreferencesUtil().init();
+  } catch (e) {
+    print('SharedPreferencesUtil init failed: $e');
+  }
+  try {
+    await StorageUtil().init();
+  } catch (e) {
+    print('StorageUtil init failed: $e');
+  }
 
   runApp(
     MultiBlocProvider(
