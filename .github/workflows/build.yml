@@ -1,4 +1,4 @@
-name: Flutter Multi-Platform Build
+name: Flutter iOS Build
 
 on:
   push:
@@ -10,37 +10,6 @@ permissions:
   contents: write
 
 jobs:
-  build-android:
-    name: Build Android
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.32.8'
-          channel: 'stable'
-          cache: true
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build APK (Debug Mode)
-        run: flutter build apk --debug
-
-      - name: Rename APK
-        run: |
-          cd build/app/outputs/flutter-apk/
-          mv app-debug.apk xiaozhi-debug.apk
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-debug
-          path: build/app/outputs/flutter-apk/xiaozhi-debug.apk
-
   build-ios:
     name: Build iOS
     runs-on: macos-latest
@@ -81,15 +50,9 @@ jobs:
 
   create-release:
     name: Create GitHub Release
-    needs: [build-android, build-ios]
+    needs: [build-ios]
     runs-on: ubuntu-latest
     steps:
-      - name: Download Android Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: android-debug
-          path: android-debug
-
       - name: Download iOS Artifact
         uses: actions/download-artifact@v4
         with:
@@ -109,5 +72,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            android-debug/xiaozhi-debug.apk
             ios-release/xiaozhi.ipa
